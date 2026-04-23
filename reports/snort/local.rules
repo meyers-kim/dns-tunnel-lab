@@ -1,0 +1,6 @@
+# Snort-compatible lab rules. Tested syntax may vary by Snort version/config.
+# Example Snort 2 usage:
+# snort -A console -q -r pcaps/demo_dns_tunnel.pcap -c /etc/snort/snort.conf -S RULE_PATH=rules/snort_dns_tunnel.rules
+
+alert udp any any -> any 53 (msg:"LAB DNS tunneling domain tunnel.lab"; content:"|06|tunnel|03|lab|00|"; nocase; sid:1001001; rev:1; priority:1;)
+alert udp any any -> any 53 (msg:"LAB Possible DNS tunnel long encoded label"; pcre:"/[a-z2-7]{45,}\x03[0-9]{3}\x06[a-z0-9]{6}\x06tunnel\x03lab\x00/i"; sid:1001002; rev:1; priority:1;)

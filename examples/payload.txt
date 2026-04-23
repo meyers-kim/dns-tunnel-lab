@@ -1,0 +1,2 @@
+This is a small lab-only file transfer demonstration.
+The client will Base32-encode this content into DNS query labels under tunnel.lab.

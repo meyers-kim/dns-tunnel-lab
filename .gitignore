@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+reports/suricata/
+reports/snort/logs/
+*.Zone.Identifier
