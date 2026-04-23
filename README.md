@@ -14,7 +14,6 @@ src/analyze_pcap.py            Finds DNS tunneling indicators in a PCAP
 rules/suricata_dns_tunnel.rules
 rules/snort_dns_tunnel.rules
 examples/payload.txt
-reports/answers.md             Filled-in answers for the worksheet
 requirements.txt
 Makefile
 ```
@@ -143,12 +142,30 @@ Snort installations vary. A common pattern is:
 snort -A console -q -r pcaps/demo_dns_tunnel.pcap -c /etc/snort/snort.conf -R rules/snort_dns_tunnel.rules
 ```
 
-If your Snort version does not support `-R`, copy the rule lines into your local rules file and include that file from `snort.conf`.
+On my Snort version, the -R option did not work because it was interpreted as a pidfile suffix. 
+I copied the  Snort rules to reports/snort/local.rules and replaced the unsupported classtype with priority:1. 
+Then I ran Snort with a small local config and a local log directory.
 
-## 7. Worksheet answers
+```bash
+mkdir -p reports/snort/logs
 
-See `reports/answers.md` for ready-to-submit answers. Adapt wording to match your own PCAP if you captured live traffic.
+sed 's/classtype:policy-violation;/priority:1;/g' \
+  rules/snort_dns_tunnel.rules > reports/snort/local.rules
 
-## Safety note
+cat > reports/snort/snort-lab.conf <<'EOF'
+var HOME_NET any
+var EXTERNAL_NET any
+var RULE_PATH ./reports/snort
 
-Run this only in your own lab/VM. The scripts are bound to localhost by default and are designed to demonstrate detection, not to bypass monitoring on real networks.
+config checksum_mode: none
+
+include $RULE_PATH/local.rules
+EOF
+
+snort -A console -q \
+  -r pcaps/demo_dns_tunnel.pcap \
+  -c reports/snort/snort-lab.conf \
+  -k none \
+  -l reports/snort/logs
+```
+
